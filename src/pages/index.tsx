@@ -1,7 +1,11 @@
 /** @jsxImportSource @emotion/react */
 
 import styles from "@/styles/Home.module.css";
-import { GetServerSideProps, InferGetStaticPropsType } from "next";
+import {
+  GetServerSideProps,
+  GetStaticProps,
+  InferGetStaticPropsType,
+} from "next";
 import { useEffect, useState } from "react";
 import Button from "../../components/Button";
 
@@ -20,13 +24,15 @@ type Board = {
 
 export default function Home({
   repo,
-}: InferGetStaticPropsType<typeof getServerSideProps>) {
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const [inputText, setInputText] = useState<string>("");
   const [board, setBoard] = useState<Board[]>([]);
 
   useEffect(() => {
     const localBoard = localStorage?.getItem("List");
-    localBoard ? setBoard(JSON.parse(localBoard)) : setBoard(repo);
+    localBoard?.length === 1
+      ? setBoard(JSON.parse(localBoard))
+      : setBoard(repo);
   }, []);
   return (
     <>
@@ -125,11 +131,11 @@ export default function Home({
   );
 }
 
-export const getServerSideProps = (async () => {
+export const getStaticProps = (async () => {
   const res = await fetch(
     "https://jsonplaceholder.typicode.com/todos?_limit=5"
   );
   const repo: Board[] = await res.json();
   return { props: { repo } };
-}) satisfies GetServerSideProps<{ repo: Board[] }>;
+}) satisfies GetStaticProps<{ repo: Board[] }>;
 //
